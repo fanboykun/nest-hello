@@ -17,7 +17,7 @@ export class GroupsService {
   findAll(name : string, isWithMember : boolean) {
     const g : Group[] = groups
 
-    if(isWithMember === true ) { // bad practice, should convert to bool instead
+    if( isWithMember === true ) {
       g.forEach((v) => {
         v.members = members.filter((m) => { return m.CurrentGroup === v.name })
       })

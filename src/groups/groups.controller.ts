@@ -10,12 +10,12 @@ import {
   Delete,
   UseGuards,
   Query,
-  ParseBoolPipe,
  } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { JwtAuthGuard } from "../auth/jwt-auth-guard";
+import { GetGroupDto } from './dto/get-group.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -28,8 +28,11 @@ export class GroupsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(@Query('name') name : string, @Query('members', ParseBoolPipe) isWithMember : boolean ) {
-    return this.groupsService.findAll(name, isWithMember);
+  findAll(@Query() { name, members } : GetGroupDto ) {
+    return this.groupsService.findAll(
+      name, 
+      members
+      );
   }
 
   @Get(':name')

@@ -18,3 +18,57 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
+
+model Group {
+  id            Int           @id @default(autoincrement())
+  name          String
+  type          GROUP_TYPE?
+  memberCount   Int?
+  agency        Agency?       @relation(fields: [agencyId], references: [id])
+  agencyId      Int?
+  debutYear     DateTime?
+  idols         Idol[]
+  exMember      Former[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Idol {
+  id            Int       @id @default(autoincrement())
+  name          String
+  age           Int?
+  gender        Gender?
+  realName      String?
+  group         Group?     @relation(fields: [groupId], references: [id])
+  groupId       Int?
+  formerGroup   Former[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Former {
+  id            Int       @id @default(autoincrement())
+  group         Group     @relation(fields: [groupId], references: [id])
+  groupId       Int
+  idol          Idol     @relation(fields: [idolId], references: [id])
+  idolId        Int
+  startDate     DateTime?
+  endDate       DateTime?
+}
+
+model Agency {
+  id            Int       @id @default(autoincrement())
+  name          String?
+  startDate     DateTime?
+  groups        Group[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum GROUP_TYPE {
+  BOY_GROUP
+  GIRL_GROUP
+}

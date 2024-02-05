@@ -6,7 +6,7 @@ type Group = {
     memberCount? : number;
     agency? : string;
     debutYear? : number
-    members? : Members[] | Omit<Members, "name">[];
+    members? : Members[] 
 }
 
 export default Group
