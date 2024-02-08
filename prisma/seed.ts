@@ -1,15 +1,19 @@
 /* eslint-disable prettier/prettier */
 import { 
-  GROUP_TYPE, 
-  Gender, 
-  // Gender,
+  GROUP_TYPE,
+  Gender,
   PrismaClient
  } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-// import groups from '../src/data/groups';
-// import members from '../src/data/members';
-// import agencies from '../src/data/agencies';
-import all from '../src/data/all';
+import membersData from './data/membersData'
+import groupsData from './data/groupsData'
+import agenciesData from './data/agenciesData'
+
+// console.log(membersData,
+//    groupsData,
+//     agenciesData
+//   )
+
 
 // initialize the Prisma Client
 const prisma = new PrismaClient();
@@ -51,40 +55,73 @@ async function main() {
   await prisma.group.deleteMany({});
   await prisma.agency.deleteMany({});
 
-  for(let i = 0; i < all.length; i++) {
-    const agency = all[i];
-    const agencyCreated = await prisma.agency.create({
+  agenciesData.map(async(agency) => {
+    await prisma.agency.create({
       data: {
         name: agency.name,
       }
     })
+  })
 
-    for(let j = 0; j < agency.groups.length; j++) {
-      const group = agency.groups[j];
-      const groupCreated = await prisma.group.create({
-        data: {
-          name: group.name,
-          type: GROUP_TYPE.GIRL_GROUP,
-          agencyId: agencyCreated.id,
-          memberCount: group.memberCount
-        }
-      })
-
-      for(let k = 0; k < group.members.length; k++) {
-        const member = group.members[k];
-        await prisma.idol.create({
-          data: {
-            name: member.name,
-            age: member.age,
-            gender: Gender.FEMALE,
-            groupId: groupCreated.id,
-          }
-        })
+  groupsData.map(async(group) => {
+    await prisma.group.create({
+      data: {
+        name: group.name,
+        type: GROUP_TYPE.GIRL_GROUP,
+        memberCount: group.memberCount,
+        agency_id: group.agency_id,
       }
+    })
+  })
 
-    }
+  membersData.map(async(member) => {
+    await prisma.idol.create({
+      data: {
+        stageName: member.stageName,
+        realName: member.realName,
+        birthYear: member.birthYear,
+        country: member.country,
+        group_id: member.group_id,
+        gender: Gender.FEMALE,
+      }
+    })
+  })
 
-  }
+  // for(let i = 0; i < all.length; i++) {
+  //   const agency = all[i];
+  //   const agencyCreated = await prisma.agency.create({
+  //     data: {
+  //       name: agency.name,
+  //     }
+  //   })
+
+  //   for(let j = 0; j < agency.groups.length; j++) {
+  //     const group = agency.groups[j];
+  //     const groupCreated = await prisma.group.create({
+  //       data: {
+  //         name: group.name,
+  //         type: GROUP_TYPE.GIRL_GROUP,
+  //         agencyId: agencyCreated.id,
+  //         memberCount: group.memberCount
+  //       }
+  //     })
+
+  //     for(let k = 0; k < group.members.length; k++) {
+  //       const member = group.members[k];
+  //       await prisma.idol.create({
+  //         data: {
+  //           name: member.name,
+  //           age: member.age,
+  //           gender: Gender.FEMALE,
+  //           groupId: groupCreated.id,
+  //         }
+  //       })
+  //     }
+
+  //   }
+
+  // }
+
 }
 
 // execute the main function

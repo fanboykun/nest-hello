@@ -6,15 +6,26 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import groups from 'src/data/groups';
 import Group from 'src/types/Group';
 import members from 'src/data/members';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class GroupsService {
+  constructor(private prisma: PrismaService) {}
+  
   create(createGroupDto: CreateGroupDto) {
     console.log(createGroupDto)
     return 'This action adds a new group';
   }
 
-  findAll(name : string, isWithMember : boolean) {
+  async findAll(name : string, isWithMember : boolean) {
+    const data = this.prisma.group.findMany({
+      take: 30,
+      include: {
+        idols: true,
+      },
+    })
+    return data;
+
     const g : Group[] = groups
 
     if( isWithMember === true ) {

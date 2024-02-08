@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -23,10 +24,11 @@ model Group {
   id            Int           @id @default(autoincrement())
   name          String
   type          GROUP_TYPE?
+  debutYear     String?
   memberCount   Int?
-  agency        Agency?       @relation(fields: [agencyId], references: [id])
-  agencyId      Int?
-  debutYear     DateTime?
+  agency        Agency?       @relation(fields: [agency_id], references: [id])
+  agency_id      Int?
+  profile_link  String?
   idols         Idol[]
   exMember      Former[]
   createdAt     DateTime      @default(now())
@@ -35,12 +37,13 @@ model Group {
 
 model Idol {
   id            Int       @id @default(autoincrement())
-  name          String
-  age           Int?
-  gender        Gender?
+  stageName     String?
   realName      String?
-  group         Group?     @relation(fields: [groupId], references: [id])
-  groupId       Int?
+  birthYear     String?
+  country       String?
+  group         Group?     @relation(fields: [group_id], references: [id])
+  group_id      Int?
+  gender        Gender?
   formerGroup   Former[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -59,7 +62,6 @@ model Former {
 model Agency {
   id            Int       @id @default(autoincrement())
   name          String?
-  startDate     DateTime?
   groups        Group[]
 }
 
