@@ -18,12 +18,31 @@ export class GroupsService {
   }
 
   async findAll(name : string, isWithMember : boolean) {
-    const data = this.prisma.group.findMany({
+    const query = {
       take: 30,
-      include: {
-        idols: true,
-      },
-    })
+      where: {},
+      include: {}
+    }
+    
+    if( isWithMember === true ) {
+      query.include = {
+        idols: true
+      }
+    }
+
+    if( name != undefined ) {
+      query.where = {
+        OR: [
+          {
+            name: { startsWith: `_${name}` },
+          },
+          {
+            name: { endsWith: `${name}` },
+          }
+        ]
+      }
+    }
+    const data = this.prisma.group.findMany(query)
     return data;
 
     const g : Group[] = groups
