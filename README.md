@@ -20,6 +20,9 @@ $ pnpm run start:dev
 
 # production mode
 $ pnpm run start:prod
+
+# database seed
+$ npx prisma db seed
 ```
 
 ## Test

@@ -3,9 +3,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 
-import groups from 'src/data/groups';
-import Group from 'src/types/Group';
-import members from 'src/data/members';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -42,48 +39,47 @@ export class GroupsService {
         ]
       }
     }
-    const data = this.prisma.group.findMany(query)
+    const data = await this.prisma.group.findMany(query)
     return data;
+  }
 
-    const g : Group[] = groups
-
+  async findOne(numId: number, id:string, isWithMember: boolean = false) {
+    if(!id && isNaN(numId)) {
+      throw new NotFoundException(`No group found: ${id}`);
+    }
+    const query = {
+      where: {},
+      include: {}
+    }
     if( isWithMember === true ) {
-      g.forEach((v) => {
-        v.members = members.filter((m) => { return m.CurrentGroup === v.name })
-      })
+      query.include = {
+        idols: true
+      }
+    }else {
+      delete query.include;  // delete query.include;
     }
-
-    if( name == undefined || name == null || name.length == 0 ) {
-      return g
+    try {
+      if(!isNaN(numId)) {
+        query.where = { id: numId }
+        const dataFromId = await this.prisma.group.findFirst(query)
+        return dataFromId
+      }else if(isNaN(numId) && id != '') {
+        query.where = {
+          OR: [
+            {
+              name: { startsWith: `_${id}` },
+            },
+            {
+              name: { endsWith: `${id}` },
+            }
+          ]
+        }
+        const dataFromName = await this.prisma.group.findFirst(query)
+        return dataFromName
+      }
+    } catch(err) {
+      console.log(err)
     }
-
-    const gf : Array<Group> | undefined = groups.filter((v) => { return v.name.toUpperCase().includes(name.toUpperCase()) })
-    return gf
-
-  }
-
-  findOne(name : string) {
-    const g = name
-    if(!g) {
-      throw new NotFoundException(`No group found for name: ${name}`);
-    }
-
-    const gf : Array<Group> | undefined = groups.filter((v) => { return g.toUpperCase() === v.name.toUpperCase() })
-    return gf
-  }
-
-  findOneDetails(name : string) {
-    const g = name
-
-    const gf = groups.filter((v) => { return g.toUpperCase() === v.name.toUpperCase() })
-    const group : Group = gf[0]
-    if(!group) { 
-      throw new NotFoundException(`No group found for name: ${group}`);
-    }
-
-    group.members = members.filter((v) => { return v.CurrentGroup === g })
-
-    return new Array(group)
   }
 
   update(id: number, updateGroupDto: UpdateGroupDto) {
